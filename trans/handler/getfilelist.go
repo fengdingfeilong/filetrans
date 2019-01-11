@@ -4,12 +4,13 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"filetrans/trans/message"
-	"filetrans/trans/message/cmdtype"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/fengdingfeilong/filetrans/trans/message"
+	"github.com/fengdingfeilong/filetrans/trans/message/cmdtype"
 
 	"github.com/fengdingfeilong/roshan"
 	rhandler "github.com/fengdingfeilong/roshan/handler"

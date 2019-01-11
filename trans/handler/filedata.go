@@ -2,12 +2,13 @@ package handler
 
 import (
 	"encoding/binary"
-	"filetrans/trans/message"
-	"filetrans/trans/message/cmdtype"
 	"fmt"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/fengdingfeilong/filetrans/trans/message"
+	"github.com/fengdingfeilong/filetrans/trans/message/cmdtype"
 
 	"github.com/fengdingfeilong/roshan"
 	rhandler "github.com/fengdingfeilong/roshan/handler"

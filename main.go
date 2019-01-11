@@ -2,14 +2,15 @@ package main
 
 import (
 	"bufio"
-	"filetrans/trans"
-	"filetrans/trans/handler"
-	"filetrans/trans/message"
-	"filetrans/trans/message/cmdtype"
 	"flag"
 	"fmt"
 	"net"
 	"os"
+
+	"github.com/fengdingfeilong/filetrans/trans"
+	"github.com/fengdingfeilong/filetrans/trans/handler"
+	"github.com/fengdingfeilong/filetrans/trans/message"
+	"github.com/fengdingfeilong/filetrans/trans/message/cmdtype"
 
 	"github.com/fengdingfeilong/roshan"
 	rmessage "github.com/fengdingfeilong/roshan/message"

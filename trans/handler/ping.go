@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"filetrans/trans/message/cmdtype"
 	"strings"
+
+	"github.com/fengdingfeilong/filetrans/trans/message/cmdtype"
 
 	rhandler "github.com/fengdingfeilong/roshan/handler"
 	"github.com/fengdingfeilong/roshan/message"
