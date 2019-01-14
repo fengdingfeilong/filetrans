@@ -49,3 +49,9 @@ func (h *FileList) Execute(data []byte) {
 	}
 	h.files = append(h.files, msg.Files...)
 }
+
+func (h *FileList) Receive(para *rhandler.CommObj) {
+	if para.Src == cmdtype.Accept {
+		h.files = h.files[:0]
+	}
+}

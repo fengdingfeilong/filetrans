@@ -1,8 +1,9 @@
 package cmdtype
 
 import (
-	"github.com/fengdingfeilong/roshan/message"
 	"strconv"
+
+	"github.com/fengdingfeilong/roshan/message"
 )
 
 const (
@@ -15,7 +16,7 @@ const (
 	Ping
 	Transfer
 	TransferCancel
-	TransferSuccess
+	TransferComplete
 	Error
 	Command
 

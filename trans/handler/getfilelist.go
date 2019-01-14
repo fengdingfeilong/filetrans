@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -39,6 +40,7 @@ func (h *GetFileList) Execute(data []byte) {
 		roshantool.PrintErr("handler.GetFileList.Execute", err.Error())
 		return
 	}
+	fmt.Println("begin transfer")
 	files := getFileList(h.dir)
 	for i := 0; i < len(files); i += 50 {
 		j := i + 50

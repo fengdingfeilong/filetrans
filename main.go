@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"time"
 
 	"github.com/fengdingfeilong/filetrans/trans"
 	"github.com/fengdingfeilong/filetrans/trans/handler"
@@ -70,7 +71,13 @@ func getCmdPara() *trans.CmdPara {
 }
 
 func isServer(para *trans.CmdPara) (bool, string) {
-	_, err := os.Stat(para.Source)
+	if para.Source == "" {
+		return false, ""
+	}
+	f, err := os.Stat(para.Source)
+	if !f.IsDir() {
+		return false, "source should be an folder"
+	}
 	if err != nil {
 		var s string
 		if os.IsNotExist(err) {
@@ -84,7 +91,13 @@ func isServer(para *trans.CmdPara) (bool, string) {
 }
 
 func isClient(para *trans.CmdPara) (bool, string) {
-	_, err := os.Stat(para.Target)
+	if para.Target == "" {
+		return false, ""
+	}
+	f, err := os.Stat(para.Target)
+	if !f.IsDir() {
+		return false, "target should be an folder"
+	}
 	if err != nil {
 		var s string
 		if os.IsNotExist(err) {
@@ -117,6 +130,7 @@ func startServer(para *trans.CmdPara) {
 	server.AddHandler(cmdtype.Disconnect, handler.NewDisconnect(server))
 	server.AddHandler(cmdtype.GetFileList, handler.NewGetFileList(server, para.Source))
 	server.AddHandler(cmdtype.GetFile, handler.NewGetFile(server))
+	server.AddHandler(cmdtype.TransferComplete, handler.NewTransferComplete(server))
 	server.Start(port)
 }
 
@@ -127,15 +141,23 @@ func startClient(para *trans.CmdPara) {
 	client.SocketConnected = cliConnected
 	client.BeforeClose = cliBeforeClose
 	client.CmdMessageReceived = cmdMsgReceived
+	client.SocketDisconnect = cliDisconnected
 	client.AddHandler(cmdtype.Accept, handler.NewAccept(client))
 	client.AddHandler(cmdtype.Reject, handler.NewReject(client))
 	client.AddHandler(cmdtype.FileList, handler.NewFileList(client))
 	client.AddHandler(cmdtype.Data, handler.NewFileData(client, para.Target))
-	client.Connect(para.IP, port)
+	c := client.Connect(para.IP, port)
+	if !c {
+		fmt.Println("can not connect server")
+	}
 }
 
 func showHelp(para *trans.CmdPara) bool {
 	if para.Help {
+		fmt.Println("source side usage:")
+		fmt.Println("ft.exe -Source foldername")
+		fmt.Println("target side usage:")
+		fmt.Println("ft.exe -IP ip -Key key -Target foldername")
 		flag.PrintDefaults()
 		return true
 	}
@@ -172,6 +194,18 @@ func cmdMsgReceived(conn net.Conn, t rmessage.CmdType) {
 	roshantool.Println("received cmd message :" + cmdtype.GetCmdString(t))
 	if t == cmdtype.Connect {
 		server.StartHandlePacket(conn)
+	}
+}
+
+func cliDisconnected(conn net.Conn) {
+	for {
+		c := client.Connect(para.IP, port)
+		if !c {
+			time.Sleep(time.Second * 3)
+		} else {
+			fmt.Println("Reconnected")
+			break
+		}
 	}
 }
 

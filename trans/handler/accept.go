@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/fengdingfeilong/filetrans/trans/message"
 	"github.com/fengdingfeilong/filetrans/trans/message/cmdtype"
@@ -33,9 +34,10 @@ func (h *Accept) Execute(data []byte) {
 		roshantool.PrintErr("handler.Accept.Execute", err.Error())
 	} else {
 		roshantool.Printf("%s accept", msg.RemoteInfo.Addr)
+		fmt.Println("connected, begin transfer")
+		h.client.Transmit(rhandler.NewCommObj(cmdtype.Accept, cmdtype.FileList))
 		m := message.NewGetFile()
 		buff := rmessage.GetCommandBytes(cmdtype.GetFileList, m)
 		h.Conn().Write(buff)
 	}
-
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/fengdingfeilong/filetrans/trans/message"
@@ -42,6 +43,7 @@ func (h *GetFile) Execute(data []byte) {
 		roshantool.PrintErr("handler.GetFile.Execute", err.Error())
 		return
 	}
+	fmt.Printf("%s transfering...\n", msg.Fullpath)
 	tid := ([]byte)(uuid.Parse(msg.TransferID))
 	fi, _ := fp.Stat()
 	size := fi.Size()

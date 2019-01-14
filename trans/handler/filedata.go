@@ -56,7 +56,7 @@ func (h *FileData) Execute(data []byte) {
 	spath := path.Join(h.dstdir, strings.TrimLeft(file.Fullpath, h.srcdir))
 	offset := binary.BigEndian.Uint64(data[16:24])
 	if offset == 0 { //the first offset
-		fmt.Println("first packet received")
+		//fmt.Println("first packet received")
 		f, err := os.OpenFile(spath, os.O_WRONLY|os.O_CREATE, os.ModeAppend|os.ModePerm)
 		if err != nil {
 			f.Close()
@@ -72,10 +72,23 @@ func (h *FileData) Execute(data []byte) {
 		h.savers[tid].Write(data[24:])
 	}
 	if int64(offset)+int64(len(data))-int64(24) == file.Size { //the last offset
-		fmt.Printf("last packet received, total file len is %d\n", file.Size)
+		//fmt.Printf("last packet received, total file len is %d\n", file.Size)
+		fmt.Printf("%s transfered compele\n", file.Fullpath)
 		h.savers[tid].Close()
+		if h.currentIndex == len(h.files) {
+			roshantool.Println("all files transfered complete")
+			h.sendCompeleteMsg()
+			os.Exit(0)
+			return
+		}
 		h.sendGetFileRequest()
 	}
+}
+
+func (h *FileData) sendCompeleteMsg() {
+	msg := message.NewTransferComplete()
+	buff := rmessage.GetCommandBytes(cmdtype.TransferComplete, msg)
+	h.Conn().Write(buff)
 }
 
 func (h *FileData) Receive(para *rhandler.CommObj) {
@@ -91,9 +104,25 @@ func (h *FileData) Receive(para *rhandler.CommObj) {
 	}
 }
 
+func (h *FileData) localfileExist() bool {
+	f := h.files[h.currentIndex]
+	spath := path.Join(h.dstdir, strings.TrimLeft(f.Fullpath, h.srcdir))
+	_, err := os.Stat(spath)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func (h *FileData) sendGetFileRequest() {
 	if h.currentIndex >= len(h.files) {
 		roshantool.PrintErr("handler.FileData.sendGetFileRequest", "current request index out of filelist size")
+		return
+	}
+	e := h.localfileExist()
+	if e { //skip exist file
+		h.currentIndex++
+		h.sendGetFileRequest()
 		return
 	}
 	msg := message.NewGetFile()
@@ -102,5 +131,5 @@ func (h *FileData) sendGetFileRequest() {
 	buff := rmessage.GetCommandBytes(cmdtype.GetFile, msg)
 	h.Conn().Write(buff)
 	h.currentIndex++
-	fmt.Printf("%s transferring...\n", msg.Fullpath)
+	fmt.Printf("Getting %s...\n", msg.Fullpath)
 }
