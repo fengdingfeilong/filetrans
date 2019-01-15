@@ -8,6 +8,7 @@ type GetFile struct {
 	message.Message
 	TransferID string `json:"transferID"`
 	Fullpath   string `json:"fullpath"`
+	Offset     int64  `Offset`
 }
 
 func NewGetFile() *GetFile {

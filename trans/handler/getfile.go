@@ -38,6 +38,7 @@ func (h *GetFile) Execute(data []byte) {
 		return
 	}
 	fp, err := os.Open(msg.Fullpath)
+	fp.Seek(msg.Offset, 0)
 	defer fp.Close()
 	if err != nil {
 		roshantool.PrintErr("handler.GetFile.Execute", err.Error())
@@ -54,7 +55,7 @@ func (h *GetFile) Execute(data []byte) {
 		return
 	}
 	var c int
-	for i := int64(0); i < size; i += int64(c) {
+	for i := msg.Offset; i < size; i += int64(c) {
 		c, err = fp.Read(buff[:])
 		if err != nil {
 			roshantool.PrintErr("handler.GetFile.Execute", err.Error())
@@ -62,6 +63,9 @@ func (h *GetFile) Execute(data []byte) {
 		}
 		// fmt.Printf("offset: %d, len: %d\n", i, c)
 		d := rmessage.GetDataMsgBytes(tid, i, buff[:c])
-		h.Conn().Write(d)
+		_, err := h.Conn().Write(d)
+		if err != nil {
+			break
+		}
 	}
 }

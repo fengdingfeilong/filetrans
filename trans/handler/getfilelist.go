@@ -1,13 +1,9 @@
 package handler
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"os"
 	"path"
 
 	"github.com/fengdingfeilong/filetrans/trans/message"
@@ -77,26 +73,9 @@ func getFileList(dir string) []*message.FileInfo {
 			file.Name = fi.Name()
 			file.Size = fi.Size()
 			file.Fullpath = path.Join(dir, file.Name)
-			file.Md5 = getFileMD5(file.Fullpath)
+			file.Md5 = roshantool.GetFileMD5(file.Fullpath)
 			files = append(files, &file)
 		}
 	}
 	return files
-}
-
-func getFileMD5(path string) string {
-	file, err := os.Open(path)
-	defer file.Close()
-	if err != nil {
-		roshantool.PrintErr("handler.GetFileList.getFileMD5", err.Error())
-		return ""
-	}
-	md5 := md5.New()
-	_, err = io.Copy(md5, file)
-	if err != nil {
-		roshantool.PrintErr("handler.GetFileList.getFileMD5", err.Error())
-		return ""
-	}
-	s := hex.EncodeToString(md5.Sum(nil))
-	return s
 }

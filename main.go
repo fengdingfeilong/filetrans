@@ -125,6 +125,7 @@ func startServer(para *trans.CmdPara) {
 	server.BeforeAccept = beforeAccept
 	server.SocketAccepted = servAccepted
 	server.CmdMessageReceived = cmdMsgReceived
+	server.SocketDisconnect = scliDisconnected
 	server.AddHandler(cmdtype.Connect, handler.NewConnect(server))
 	server.AddHandler(cmdtype.Ping, handler.NewPing())
 	server.AddHandler(cmdtype.Disconnect, handler.NewDisconnect(server))
@@ -169,6 +170,7 @@ func beforeAccept() {
 }
 
 func servAccepted(conn net.Conn) {
+	fmt.Println("accept client" + conn.RemoteAddr().String())
 	roshantool.Println("accept socket :" + conn.RemoteAddr().String())
 	server.StopHandlePacket(conn) //stop handle command and data packet until accept connectmessage
 }
@@ -198,6 +200,7 @@ func cmdMsgReceived(conn net.Conn, t rmessage.CmdType) {
 }
 
 func cliDisconnected(conn net.Conn) {
+	fmt.Println("Disconnected")
 	for {
 		c := client.Connect(para.IP, port)
 		if !c {
@@ -207,6 +210,10 @@ func cliDisconnected(conn net.Conn) {
 			break
 		}
 	}
+}
+
+func scliDisconnected(conn net.Conn) {
+	fmt.Println("Disconnected")
 }
 
 func roshanlog(info string, err error) {

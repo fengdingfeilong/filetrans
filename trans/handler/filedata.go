@@ -75,6 +75,11 @@ func (h *FileData) Execute(data []byte) {
 		//fmt.Printf("last packet received, total file len is %d\n", file.Size)
 		fmt.Printf("%s transfered compele\n", file.Fullpath)
 		h.savers[tid].Close()
+		b := h.checkFile(spath, file)
+		if !b {
+			fmt.Printf("%s check error\n", file.Fullpath)
+			roshantool.Printf("%s check error\n", file.Fullpath)
+		}
 		if h.currentIndex == len(h.files) {
 			roshantool.Println("all files transfered complete")
 			h.sendCompeleteMsg()
@@ -83,6 +88,18 @@ func (h *FileData) Execute(data []byte) {
 		}
 		h.sendGetFileRequest()
 	}
+}
+
+func (h *FileData) checkFile(spath string, file *message.FileInfo) bool {
+	f, err := os.Stat(spath)
+	if err != nil {
+		return false
+	}
+	if f.Size() != file.Size {
+		return false
+	}
+	md5 := roshantool.GetFileMD5(spath)
+	return md5 == file.Md5
 }
 
 func (h *FileData) sendCompeleteMsg() {
@@ -104,14 +121,16 @@ func (h *FileData) Receive(para *rhandler.CommObj) {
 	}
 }
 
-func (h *FileData) localfileExist() bool {
+func (h *FileData) needRequest() (bool, int64) {
 	f := h.files[h.currentIndex]
 	spath := path.Join(h.dstdir, strings.TrimLeft(f.Fullpath, h.srcdir))
-	_, err := os.Stat(spath)
-	if err != nil {
-		return false
+	t, err := os.Stat(spath)
+	if err != nil { //not exist
+		return true, 0
+	} else if f.Size > t.Size() { //exist but not complete
+		return true, t.Size()
 	}
-	return true
+	return false, f.Size //exist
 }
 
 func (h *FileData) sendGetFileRequest() {
@@ -119,8 +138,8 @@ func (h *FileData) sendGetFileRequest() {
 		roshantool.PrintErr("handler.FileData.sendGetFileRequest", "current request index out of filelist size")
 		return
 	}
-	e := h.localfileExist()
-	if e { //skip exist file
+	b, o := h.needRequest()
+	if !b { //skip exist file
 		h.currentIndex++
 		h.sendGetFileRequest()
 		return
@@ -128,6 +147,7 @@ func (h *FileData) sendGetFileRequest() {
 	msg := message.NewGetFile()
 	msg.TransferID = h.transids[h.currentIndex]
 	msg.Fullpath = h.files[h.currentIndex].Fullpath
+	msg.Offset = o
 	buff := rmessage.GetCommandBytes(cmdtype.GetFile, msg)
 	h.Conn().Write(buff)
 	h.currentIndex++
