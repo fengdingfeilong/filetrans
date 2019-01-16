@@ -54,20 +54,20 @@ func (h *FileData) Execute(data []byte) {
 	}
 
 	spath := path.Join(h.dstdir, strings.TrimLeft(file.Fullpath, h.srcdir))
+	os.MkdirAll(path.Dir(spath), os.ModePerm)
 	offset := binary.BigEndian.Uint64(data[16:24])
 	if offset == 0 { //the first offset
 		//fmt.Println("first packet received")
 		f, err := os.OpenFile(spath, os.O_WRONLY|os.O_CREATE, os.ModeAppend|os.ModePerm)
 		if err != nil {
 			f.Close()
-			fmt.Println(err)
+			fmt.Printf("create file error:%s\n", err)
 		} else {
 			f.Truncate(0)
 			h.savers[tid] = f
 		}
 	}
 	// fmt.Printf("offset: %d, len: %d\n", offset, len(data)-24)
-	os.MkdirAll(path.Dir(spath), os.ModePerm)
 	if h.savers[tid] != nil {
 		h.savers[tid].Write(data[24:])
 	}
