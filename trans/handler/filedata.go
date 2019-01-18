@@ -81,9 +81,7 @@ func (h *FileData) Execute(data []byte) {
 			roshantool.Printf("%s check error\n", file.Fullpath)
 		}
 		if h.currentIndex == len(h.files) {
-			roshantool.Println("all files transfered complete")
-			h.sendCompeleteMsg()
-			os.Exit(0)
+			h.transferComplete()
 			return
 		}
 		h.sendGetFileRequest()
@@ -100,12 +98,6 @@ func (h *FileData) checkFile(spath string, file *message.FileInfo) bool {
 	}
 	md5 := roshantool.GetFileMD5(spath)
 	return md5 == file.Md5
-}
-
-func (h *FileData) sendCompeleteMsg() {
-	msg := message.NewTransferComplete()
-	buff := rmessage.GetCommandBytes(cmdtype.TransferComplete, msg)
-	h.Conn().Write(buff)
 }
 
 func (h *FileData) Receive(para *rhandler.CommObj) {
@@ -134,8 +126,8 @@ func (h *FileData) needRequest() (bool, int64) {
 }
 
 func (h *FileData) sendGetFileRequest() {
-	if h.currentIndex >= len(h.files) {
-		roshantool.PrintErr("handler.FileData.sendGetFileRequest", "current request index out of filelist size")
+	if h.currentIndex == len(h.files) {
+		h.transferComplete()
 		return
 	}
 	b, o := h.needRequest()
@@ -152,4 +144,18 @@ func (h *FileData) sendGetFileRequest() {
 	h.Conn().Write(buff)
 	h.currentIndex++
 	fmt.Printf("Getting %s...\n", msg.Fullpath)
+}
+
+func (h *FileData) sendCompeleteMsg() {
+	msg := message.NewTransferComplete()
+	buff := rmessage.GetCommandBytes(cmdtype.TransferComplete, msg)
+	h.Conn().Write(buff)
+}
+
+func (h *FileData) transferComplete() {
+	fmt.Println("all files transfered complete")
+	roshantool.Println("all files transfered complete")
+	h.sendCompeleteMsg()
+	h.client.Close()
+	os.Exit(0)
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/fengdingfeilong/filetrans/trans/message"
@@ -29,7 +30,10 @@ func (h *TransferComplete) Execute(data []byte) {
 	var msg message.TransferComplete
 	err := json.Unmarshal(data, &msg)
 	if err != nil {
-		roshantool.Println("all files transfered complete")
-		os.Exit(0)
+		roshantool.PrintErr("handler.transfercomplete.Execute", err.Error())
+		return
 	}
+	fmt.Println("all files transfered complete")
+	roshantool.Println("all files transfered complete")
+	os.Exit(0)
 }
