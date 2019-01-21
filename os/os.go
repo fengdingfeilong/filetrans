@@ -10,12 +10,12 @@ const (
 	Win7
 	// Win10 windows10
 	Win10
-	// MacOS
+	// MacOS mac os
 	MacOS
 	// IOS iphone syetem
 	IOS
-	// Android 安卓手机系统
+	// Android Android
 	Android
-	// Linux
+	// Linux linux
 	Linux
 )
