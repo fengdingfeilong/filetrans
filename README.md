@@ -83,7 +83,7 @@ target->source:disconnect(then target close connection)
 
 #### 3. Security design
 
-Key Agreement process
+AES algorithm, CTR mode
 
-​    
+    
 
