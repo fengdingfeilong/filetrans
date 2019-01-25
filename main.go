@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"math/rand"
 	"net"
 	"os"
 	"time"
@@ -122,6 +123,10 @@ var server *roshan.Server
 
 func startServer(para *trans.CmdPara) {
 	server = roshan.NewServer()
+	rand.Seed(time.Now().UnixNano())
+	sk := fmt.Sprintf("%04d", rand.Intn(10000))
+	fmt.Println("Key:", sk)
+	server.SetSK(sk)
 	server.BeforeAccept = beforeAccept
 	server.SocketAccepted = servAccepted
 	server.CmdMessageReceived = cmdMsgReceived
@@ -139,6 +144,7 @@ var client *roshan.Client
 
 func startClient(para *trans.CmdPara) {
 	client = roshan.NewClient()
+	client.SetSK(para.Key)
 	client.SocketConnected = cliConnected
 	client.BeforeClose = cliBeforeClose
 	client.CmdMessageReceived = cmdMsgReceived
