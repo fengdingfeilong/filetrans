@@ -22,6 +22,8 @@ import (
 var para *trans.CmdPara
 
 func main() {
+	roshantool.PrintQuitStack()
+
 	para = getCmdPara()
 	if showHelp(para) {
 		return
