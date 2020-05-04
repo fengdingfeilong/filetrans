@@ -1,7 +1,8 @@
 package message
 
 import (
-	"github.com/fengdingfeilong/filetrans/peer"
+	"filetrans/peer"
+
 	"github.com/fengdingfeilong/roshan/message"
 )
 

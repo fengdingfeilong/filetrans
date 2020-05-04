@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 
-	"github.com/fengdingfeilong/filetrans/trans/message"
+	"filetrans/trans/message"
 
 	"github.com/fengdingfeilong/roshan"
 	rhandler "github.com/fengdingfeilong/roshan/handler"

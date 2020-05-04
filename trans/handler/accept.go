@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/fengdingfeilong/filetrans/trans/message"
-	"github.com/fengdingfeilong/filetrans/trans/message/cmdtype"
+	"filetrans/trans/message"
+	"filetrans/trans/message/cmdtype"
 
 	"github.com/fengdingfeilong/roshan"
 	"github.com/fengdingfeilong/roshan/roshantool"

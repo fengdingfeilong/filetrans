@@ -9,12 +9,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/fengdingfeilong/filetrans/trans"
-	"github.com/fengdingfeilong/filetrans/trans/handler"
-	"github.com/fengdingfeilong/filetrans/trans/message"
-	"github.com/fengdingfeilong/filetrans/trans/message/cmdtype"
+	"filetrans/trans"
+	"filetrans/trans/handler"
+	"filetrans/trans/message"
+	"filetrans/trans/message/cmdtype"
 
 	"github.com/fengdingfeilong/roshan"
+	"github.com/fengdingfeilong/roshan/errors"
 	rmessage "github.com/fengdingfeilong/roshan/message"
 	"github.com/fengdingfeilong/roshan/roshantool"
 )
@@ -22,7 +23,7 @@ import (
 var para *trans.CmdPara
 
 func main() {
-	roshantool.PrintQuitStack()
+	// roshantool.PrintQuitStack()
 
 	para = getCmdPara()
 	if showHelp(para) {
@@ -133,6 +134,7 @@ func startServer(para *trans.CmdPara) {
 	server.SocketAccepted = servAccepted
 	server.CmdMessageReceived = cmdMsgReceived
 	server.SocketDisconnect = scliDisconnected
+	server.ErrorOccurred = servError
 	server.AddHandler(cmdtype.Connect, handler.NewConnect(server))
 	server.AddHandler(cmdtype.Ping, handler.NewPing())
 	server.AddHandler(cmdtype.Disconnect, handler.NewDisconnect(server))
@@ -151,6 +153,7 @@ func startClient(para *trans.CmdPara) {
 	client.BeforeClose = cliBeforeClose
 	client.CmdMessageReceived = cmdMsgReceived
 	client.SocketDisconnect = cliDisconnected
+	client.ErrorOccurred = cliError
 	client.AddHandler(cmdtype.Accept, handler.NewAccept(client))
 	client.AddHandler(cmdtype.Reject, handler.NewReject(client))
 	client.AddHandler(cmdtype.FileList, handler.NewFileList(client))
@@ -181,6 +184,26 @@ func servAccepted(conn net.Conn) {
 	fmt.Println("accept client" + conn.RemoteAddr().String())
 	roshantool.Println("accept socket :" + conn.RemoteAddr().String())
 	server.StopHandlePacket(conn) //stop handle command and data packet until accept connectmessage
+}
+
+func servError(conn net.Conn, err error) {
+	if err == errors.PasswordErr {
+		// m := message.NewReject()
+		// m.RemoteInfo.Addr = conn.LocalAddr().String()
+		// m.Reason = err.Error()
+		// buff := rmessage.GetCommandBytes(cmdtype.Reject, m)
+		// conn.Write(buff)
+		fmt.Println("client " + err.Error())
+		os.Exit(0)
+		return
+	}
+	fmt.Println("error" + err.Error())
+}
+func cliError(conn net.Conn, err error) {
+	if err == errors.PasswordErr {
+		os.Exit(0)
+	}
+	fmt.Println("error" + err.Error())
 }
 
 func cliConnected(conn net.Conn) {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fengdingfeilong/filetrans/trans/message"
+	"filetrans/trans/message"
 
 	"github.com/fengdingfeilong/roshan"
 	rhandler "github.com/fengdingfeilong/roshan/handler"
@@ -37,6 +37,10 @@ func (h *GetFile) Execute(data []byte) {
 		roshantool.PrintErr("handler.GetFile.Execute", err.Error())
 		return
 	}
+	go h.sendFile(&msg)
+}
+
+func (h *GetFile) sendFile(msg *message.GetFile) {
 	fp, err := os.Open(msg.Fullpath)
 	fp.Seek(msg.Offset, 0)
 	defer fp.Close()

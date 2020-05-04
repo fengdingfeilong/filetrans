@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fengdingfeilong/filetrans/trans/message"
+	"filetrans/trans/message"
 
 	"github.com/fengdingfeilong/roshan"
 

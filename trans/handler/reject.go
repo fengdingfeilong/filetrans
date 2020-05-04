@@ -2,8 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 
-	"github.com/fengdingfeilong/filetrans/trans/message"
+	"filetrans/trans/message"
 
 	"github.com/fengdingfeilong/roshan"
 	rhandler "github.com/fengdingfeilong/roshan/handler"
@@ -29,6 +31,8 @@ func (h *Reject) Execute(data []byte) {
 	if err != nil {
 		roshantool.PrintErr("handler.Reject.Execute", err.Error())
 	} else {
-		roshantool.Print("%s Reject, reason: %s ", msg.RemoteInfo.Addr, msg.Reason)
+		roshantool.Printf("%s Reject, reason: %s \r\n", msg.RemoteInfo.Addr, msg.Reason)
 	}
+	fmt.Printf("%s Reject, reason: %s \r\n", msg.RemoteInfo.Addr, msg.Reason)
+	os.Exit(0)
 }

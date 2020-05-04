@@ -1,7 +1,7 @@
 package peer
 
 import (
-	"github.com/fengdingfeilong/filetrans/os"
+	"filetrans/os"
 )
 
 type Info struct {

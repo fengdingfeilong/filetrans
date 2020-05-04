@@ -3,7 +3,7 @@ package handler
 import (
 	"strings"
 
-	"github.com/fengdingfeilong/filetrans/trans/message/cmdtype"
+	"filetrans/trans/message/cmdtype"
 
 	rhandler "github.com/fengdingfeilong/roshan/handler"
 	"github.com/fengdingfeilong/roshan/message"

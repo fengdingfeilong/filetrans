@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"path"
 
-	"github.com/fengdingfeilong/filetrans/trans/message"
-	"github.com/fengdingfeilong/filetrans/trans/message/cmdtype"
+	"filetrans/trans/message"
+	"filetrans/trans/message/cmdtype"
 
 	"github.com/fengdingfeilong/roshan"
 	rhandler "github.com/fengdingfeilong/roshan/handler"
@@ -37,7 +37,11 @@ func (h *GetFileList) Execute(data []byte) {
 		return
 	}
 	fmt.Println("begin transfer")
-	files := getFileList(h.dir)
+	go h.handGetFileList(h.dir)
+}
+
+func (h *GetFileList) handGetFileList(dir string) {
+	files := h.getFileList(dir)
 	for i := 0; i < len(files); i += 50 {
 		j := i + 50
 		if j > len(files) {
@@ -55,7 +59,7 @@ func (h *GetFileList) Execute(data []byte) {
 	h.Conn().Write(buff)
 }
 
-func getFileList(dir string) []*message.FileInfo {
+func (h *GetFileList) getFileList(dir string) []*message.FileInfo {
 	files := make([]*message.FileInfo, 0)
 	rd, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -64,7 +68,7 @@ func getFileList(dir string) []*message.FileInfo {
 	}
 	for _, fi := range rd {
 		if fi.IsDir() {
-			fs := getFileList(path.Join(dir, fi.Name()))
+			fs := h.getFileList(path.Join(dir, fi.Name()))
 			if fs != nil {
 				files = append(files, fs...)
 			}
