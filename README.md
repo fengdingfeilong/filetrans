@@ -69,8 +69,10 @@ in the payload of the tcp packet
 when implement the file transfer, can split many litter packets.
 
 **file transfer sequence**
+
 ![sequence]
-(https://github.com/fengdingfeilong/filetrans/blob/master/SequenceDiagram.PNG?raw=true)
+
+(https://github.com/fengdingfeilong/filetrans/raw/master/SequenceDiagram.PNG)
 
 #### 3. Security design
 
