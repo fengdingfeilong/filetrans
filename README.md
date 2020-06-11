@@ -70,9 +70,7 @@ when implement the file transfer, can split many litter packets.
 
 **file transfer sequence**
 
-![sequence]
-
-(https://github.com/fengdingfeilong/filetrans/blob/master/SequenceDiagram.PNG?raw=true)
+![sequence](https://github.com/fengdingfeilong/filetrans/blob/master/SequenceDiagram.PNG?raw=true)
 
 #### 3. Security design
 
